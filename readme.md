@@ -10,7 +10,7 @@ This tool is designed to analyze the response times of DNS servers by sending pi
 
 To install the project, clone the repository to your local machine by running the following command in your terminal:
 
-```curl -sSL https://raw.githubusercontent.com/TurkishLinuxUser/uBeDNS/main/install.sh | sudo bash```
+```curl -sSL https://raw.githubusercontent.com/TurkishLinuxUser/uBeDNS/main/install.sh```
 
 Then navigate to the project directory and initiate the installation by executing the following 
 
