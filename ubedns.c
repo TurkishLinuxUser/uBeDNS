@@ -52,7 +52,7 @@ void ping_dns(const char *dns) {
     snprintf(command, sizeof(command), "ping -c 3 -q %s", dns);
     FILE *fp = popen(command, "r");
     if (fp == NULL) {
-        perror("popen hatası");
+        perror("popen error");
         return;
     }
 
@@ -67,13 +67,13 @@ void ping_dns(const char *dns) {
             const char *status;
             if (avg <= 60) {
                 color = "\033[0;32m";  // Yeşil
-                status = "(Mükemmel)";
+                status = "(Perfect)";
             } else if (avg <= 110) {
                 color = "\033[0;33m";  // Sarı
-                status = "(Orta)";
+                status = "(Medium)";
             } else {
                 color = "\033[0;31m";  // Kırmızı
-                status = "(Berbat)";
+                status = "(Very Bad)";
             }
 
             printf("%s%s -- %.2fms %s\033[0m\n", color, dns, avg, status);
@@ -82,7 +82,7 @@ void ping_dns(const char *dns) {
     }
 
     if (!success) {
-        printf("\033[0;31mDNS adresine ping atılamadı. Bu DNS adresi bulunamayabilir veya kapalı olabilir.\033[0m\n");
+        printf("\033[0;31mCould not ping the DNS address. This DNS address may not be available or may be down.\033[0m\n");
     }
 
     pclose(fp);
@@ -91,7 +91,7 @@ void ping_dns(const char *dns) {
 void ping_default_dns(const char *filename) {
     FILE *file = fopen(filename, "r");
     if (!file) {
-        perror("Dosya açılamadı");
+        perror("File could not be opened");
         return;
     }
 
@@ -108,14 +108,14 @@ void ping_default_dns(const char *filename) {
 
     cJSON *json = cJSON_Parse(data);
     if (!json) {
-        fprintf(stderr, "JSON verisi işlenemedi: %s\n", cJSON_GetErrorPtr());
+        fprintf(stderr, "Could not process JSON data: %s\n", cJSON_GetErrorPtr());
         free(data);
         return;
     }
 
     cJSON *groups = cJSON_GetObjectItem(json, "groups");
     if (!cJSON_IsArray(groups)) {
-        fprintf(stderr, "JSON dosyası uygun formatta değil.\n");
+        fprintf(stderr, "The JSON file is not in the appropriate format.\n");
         cJSON_Delete(json);
         free(data);
         return;
@@ -147,7 +147,7 @@ void ping_default_dns(const char *filename) {
 void ping_from_file(const char *filename) {
     FILE *file = fopen(filename, "r");
     if (!file) {
-        perror("Dosya açılamadı");
+        perror("File could not be opened");
         return;
     }
 
@@ -164,14 +164,14 @@ void ping_from_file(const char *filename) {
 
     cJSON *json = cJSON_Parse(data);
     if (!json) {
-        fprintf(stderr, "JSON verisi işlenemedi: %s\n", cJSON_GetErrorPtr());
+        fprintf(stderr, "Failed to process JSON data: %s\n", cJSON_GetErrorPtr());
         free(data);
         return;
     }
 
     cJSON *groups = cJSON_GetObjectItem(json, "groups");
     if (!cJSON_IsArray(groups)) {
-        fprintf(stderr, "JSON dosyası uygun formatta değil.\n");
+        fprintf(stderr, "The JSON file is not in the appropriate format.\n");
         cJSON_Delete(json);
         free(data);
         return;
@@ -203,19 +203,19 @@ void ping_from_file(const char *filename) {
 // Help Yardım Mesajı Funksiyonu
 int help() {
     printf("\n");
-    printf("UBeDNS parametreleri:\n");
+    printf("UBeDNS parameters:\n");
     //df parametresi
-    printf("--df \t Belirlediğiniz DNS listesi dosyasındaki DNS adreslerine ping atar.");
-    printf("\nKullanımı: ubedns --df [Dosya]\n\n");
-    //c parametresi
-    printf("--cd ya da -c \t Belirlediğiniz tek bir DNS adresine ping atar.");
-    printf("\nKullanımı: ubedns --cd [DNS adresi] ya da ubedns -c [DNS adresi]\n\n");
-    //help parametresi
-    printf("--help ya da -h \t Bu mesajı görmenizi sağlar.");
-    printf("\nKullanımı: ubedns --help ya da ubedns -h\n\n");
-    // start parametresi
-    printf("--start ya da -s \t Varsayılan DNS listesindeki DNS adreslerine ping atar.");
-    printf("\nKullanımı: ubedns --start ya da ubedns -s\n\n");
+    printf("--df \t Pings the DNS addresses in the DNS list file you specify.");
+    printf("\nUsage: ubedns --df [File]\n\n");
+    //c parameter
+    printf("--cd or -c \t Pings a single DNS address you specify.");
+    printf("\nUsage: ubedns --cd [DNS address] or ubedns -c [DNS address]\n\n");
+    //help parameter
+    printf("--help or -h \t Allows you to see this message.");
+    printf("\nUsage: ubedns --help or ubedns -h\n\n");
+    //start parameter
+    printf("--start or -s \t Pings DNS addresses in the default DNS list.");
+    printf("\nUsage: ubedns --start or ubedns -s\n\n");
     return 0;
 }
 
@@ -250,7 +250,7 @@ int main(int argc, char *argv[]) {
             ping_dns(argv[2]);
             return 0;
         } else {
-            printf(ANSI_COLOR_RED "Geçersiz DNS adresi. Lütfen geçerli bir DNS adresi girin.\n" ANSI_COLOR_RESET);
+            printf(ANSI_COLOR_RED "Invalid DNS address. Please enter a valid DNS address.\n" ANSI_COLOR_RESET);
             return 0;
         }
     }
@@ -262,11 +262,11 @@ int main(int argc, char *argv[]) {
 
     char input[256];
     while (true) {
-        printf("\nS - Varsayılan DNS'lere ping at\n");
-        printf("C [Custom DNS] - Belirtilen DNS'e ping at\n");
-        printf("H - Daha fazla bilgi (yardım)\n");
-        printf("Q - Programdan çık\n");
-        printf("Seçiminizi yapın: ");
+        printf("\nS - Ping default DNSs\n");
+        printf("C - Ping the specified DNS\n");
+        printf("H - More information (help)\n");
+        printf("Q - Exit the program\n");
+        printf("Choice: ");
         if (!fgets(input, sizeof(input), stdin)) {
             break;
         }
@@ -283,12 +283,12 @@ int main(int argc, char *argv[]) {
                 fflush(stdout);
                 ping_dns(dns);
             } else {
-                printf("Geçersiz DNS formatı. Lütfen tekrar deneyin.\n");
+                printf("Invalid DNS format. Please try again.\n");
             }
         } else if (input[0] == 'H' || input[0] == 'h'){
             help();
         } else {
-            printf("Geçersiz seçenek. Lütfen tekrar deneyin.\n");
+            printf("Invalid option. Please try again.\n");
         }
         printf("\n"); 
     }
